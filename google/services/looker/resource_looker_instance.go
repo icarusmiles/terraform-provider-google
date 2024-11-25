@@ -554,6 +554,12 @@ func resourceLookerInstanceCreate(d *schema.ResourceData, meta interface{}) erro
 	} else if v, ok := d.GetOkExists("fips_enabled"); !tpgresource.IsEmptyValue(reflect.ValueOf(fipsEnabledProp)) && (ok || !reflect.DeepEqual(v, fipsEnabledProp)) {
 		obj["fipsEnabled"] = fipsEnabledProp
 	}
+	geminiEnabledProp, err := expandLookerInstanceGeminiEnabled(d.Get("gemini_enabled"), d, config)
+	if err != nil {
+		return err
+	} else if v, ok := d.GetOkExists("gemini_enabled"); !tpgresource.IsEmptyValue(reflect.ValueOf(geminiEnabledProp)) && (ok || !reflect.DeepEqual(v, geminiEnabledProp)) {
+		obj["geminiEnabled"] = geminiEnabledProp
+	}
 	maintenanceWindowProp, err := expandLookerInstanceMaintenanceWindow(d.Get("maintenance_window"), d, config)
 	if err != nil {
 		return err
@@ -752,6 +758,9 @@ func resourceLookerInstanceRead(d *schema.ResourceData, meta interface{}) error 
 	if err := d.Set("fips_enabled", flattenLookerInstanceFipsEnabled(res["fipsEnabled"], d, config)); err != nil {
 		return fmt.Errorf("Error reading Instance: %s", err)
 	}
+	if err := d.Set("gemini_enabled", flattenLookerInstanceGeminiEnabled(res["geminiEnabled"], d, config)); err != nil {
+		return fmt.Errorf("Error reading Instance: %s", err)
+	}
 	if err := d.Set("ingress_private_ip", flattenLookerInstanceIngressPrivateIp(res["ingressPrivateIp"], d, config)); err != nil {
 		return fmt.Errorf("Error reading Instance: %s", err)
 	}
@@ -844,6 +853,12 @@ func resourceLookerInstanceUpdate(d *schema.ResourceData, meta interface{}) erro
 	} else if v, ok := d.GetOkExists("fips_enabled"); !tpgresource.IsEmptyValue(reflect.ValueOf(v)) && (ok || !reflect.DeepEqual(v, fipsEnabledProp)) {
 		obj["fipsEnabled"] = fipsEnabledProp
 	}
+	geminiEnabledProp, err := expandLookerInstanceGeminiEnabled(d.Get("gemini_enabled"), d, config)
+	if err != nil {
+		return err
+	} else if v, ok := d.GetOkExists("gemini_enabled"); !tpgresource.IsEmptyValue(reflect.ValueOf(v)) && (ok || !reflect.DeepEqual(v, geminiEnabledProp)) {
+		obj["giminiEnabled"] = geminiEnabledProp
+	}
 	maintenanceWindowProp, err := expandLookerInstanceMaintenanceWindow(d.Get("maintenance_window"), d, config)
 	if err != nil {
 		return err
@@ -926,6 +941,10 @@ func resourceLookerInstanceUpdate(d *schema.ResourceData, meta interface{}) erro
 
 	if d.HasChange("fips_enabled") {
 		updateMask = append(updateMask, "fipsEnabled")
+	}
+
+	if d.HasChange("gemini_enabled") {
+		updateMask = append(updateMask, "geminiEnabled")
 	}
 
 	if d.HasChange("maintenance_window") {
@@ -1394,6 +1413,10 @@ func flattenLookerInstanceEncryptionConfigKmsKeyNameVersion(v interface{}, d *sc
 }
 
 func flattenLookerInstanceFipsEnabled(v interface{}, d *schema.ResourceData, config *transport_tpg.Config) interface{} {
+	return v
+}
+
+func flattenLookerInstanceGeminiEnabled(v interface{}, d *schema.ResourceData, config *transport_tpg.Config) interface{} {
 	return v
 }
 
@@ -1943,6 +1966,10 @@ func expandLookerInstanceEncryptionConfigKmsKeyNameVersion(v interface{}, d tpgr
 }
 
 func expandLookerInstanceFipsEnabled(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandLookerInstanceGeminiEnabled(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
 	return v, nil
 }
 
